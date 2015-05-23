@@ -70,7 +70,7 @@ class MPR121(object):
         # Nothing to do here since there is very little state in the class.
         pass
 
-    def begin(self, address=MPR121_I2CADDR_DEFAULT, i2c=None, **kwargs):
+    def begin(self, bus=None, address=MPR121_I2CADDR_DEFAULT, i2c=None, **kwargs):
         self.reset_count = 0
         """Initialize communication with the MPR121. 
 
@@ -89,8 +89,13 @@ class MPR121(object):
             # the MPR121 is very sensitive and requires repeated starts to read all
             # the registers.
             I2C.require_repeated_start()
-        # Save a reference to the I2C device instance for later communication.
-        self._device = i2c.get_i2c_device(address, **kwargs)
+        
+        # Check bus number and save a reference to the I2C device instance for later communication.
+        if bus != None :
+            self._device = i2c.get_i2c_device(address, int(bus), **kwargs)
+        else  :
+            self._device = i2c.get_i2c_device(address, **kwargs)
+
         return self._reset()
 
     def _reset(self):
