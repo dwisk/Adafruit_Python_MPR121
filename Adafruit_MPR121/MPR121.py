@@ -71,6 +71,7 @@ class MPR121(object):
         pass
 
     def begin(self, address=MPR121_I2CADDR_DEFAULT, i2c=None, **kwargs):
+        self.reset_count = 0
         """Initialize communication with the MPR121. 
 
         Can specify a custom I2C address for the device using the address 
@@ -139,7 +140,10 @@ class MPR121(object):
                 if ex.errno != 110:
                     raise ex
             # Else there was a timeout, so reset the device and retry.
-            self._reset()
+            self.reset_count += 1
+            if self.reset_count < MAX_I2C_RETRIES:
+                self._reset()
+            
             # Increase count and fail after maximum number of retries.
             count += 1
             if count >= MAX_I2C_RETRIES:
